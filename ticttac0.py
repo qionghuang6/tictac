@@ -31,6 +31,11 @@ def advance(board):
             newBoards.append("".join(tstr))
     return newBoards
 
+def makeVariant(current, instructions):
+    newList = list()
+    for i in range(0,9):
+        newList.append(current[instructions[i]])
+    return newList
 
 def main():
     gameCount = 0
@@ -39,32 +44,44 @@ def main():
     xWin = 0
     currentboards = list()
     nextboards = list()
-    for i in range(0,18):
+    for i in range(0,9):
         newboard = list()
         for j in range(0,9):
             if(i == j):
                 newboard.append('x')
-            elif(i - 9 == j):
-                newboard.append('o')
             else:
                 newboard.append('_')
         currentboards.append(''.join(newboard))
-    
+    allboards = currentboards[:]
     while(len(currentboards) > 0):
         print("Current boards: ", len(currentboards))
         for board in currentboards:
             boardCount += 1
             isWin, side = isVictory(board)
-            if(isWin and side == 'o'):
-                oWin += 1
             if(isWin and side == 'x'):
                 xWin += 1
+            if(isWin and side == 'o'):
+                oWin += 1
             if(side == 'o' or side == 'x' or side == 'A'):
-                boardCount += 1
+                # finalboards.append(board)
+                gameCount += 1
             else:
                 nextboards.extend(advance(board))
         currentboards = nextboards
+        allboards.extend(nextboards)
+        nextboards = list()
 
     print(gameCount, "games", boardCount, "boards", xWin , "xWins", oWin, "oWins")
+    
+    uniqueboards = set(allboards)
+    for board in allboards:
+        if(board in uniqueboards):
+            thisboard = list(board)
+            for transet in Transformations:
+                variant = thisboard[:]
+                for change in transet:
+                    variant = makeVariant(variant, change)
+                uniqueboards.discard("".join(variant))
+    print(len(uniqueboards), "uniqueboards")
 
 main()
